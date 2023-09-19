@@ -20,7 +20,7 @@ while True:
 
     #The rectangle (Canvas, rectangle corner 1, rectangle corner 2, Color, thickness)
     img = cv.rectangle(img, (5,5), (200,200), (0, 0, 255), 1)
-    img = cv.rectangle(img, (30,30), (175,175), (0, 0, 255), -1) #-1 in thicknees fills out the given shape
+    img = cv.rectangle(img, (30,30), (175,175), (130, 130, 130), -1) #-1 in thicknees fills out the given shape
 
     #The Circle (Canvas, Centerpoint, Radius, Color, thickness)
     img = cv.circle(img, (width//2,height//2), 60, (0, 0, 255), 1)
