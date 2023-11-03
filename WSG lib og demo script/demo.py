@@ -13,4 +13,6 @@ if __name__ == "__main__":
     wsg.grip(40)
     sleep(5)
     wsg.release()
+
+    print("Test")
     
