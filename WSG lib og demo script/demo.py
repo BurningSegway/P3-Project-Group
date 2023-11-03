@@ -12,7 +12,4 @@ if __name__ == "__main__":
     input("Place an objet between wsg fingers and press enter ...")
     wsg.grip(40)
     sleep(5)
-    wsg.release()
-
-    print("Test")
-    
+    wsg.release() # Mega sejt, den trækker aldtid 10 mm relativt til det objekt den har fat i
