@@ -22,7 +22,7 @@ class image_converter:
         self.message_sub = rospy.Subscriber("/image_capture_topic", String, self.callback1, queue_size=1000)
         #self.image_sub = rospy.Subscriber("/camera/depth/image_rect_raw",Image,self.callback, queue_size=1000)
         self.image_sub = rospy.Subscriber("/camera/color/image_raw",Image,self.callback, queue_size=1000)
-
+        self.number = 0
 
 
 
@@ -45,8 +45,9 @@ class image_converter:
             print(e)
         rospy.loginfo(self.message)
         while self.message == String("capture"):
-            cv2.imshow("Image window", cv_image)
-            cv2.waitKey(3)
+            self.number +=1
+            filename = 'image' + str(self.number) +'.jpg'
+            cv2.imwrite(filename, cv_image)
             #rospy.loginfo("hej")
 
 
