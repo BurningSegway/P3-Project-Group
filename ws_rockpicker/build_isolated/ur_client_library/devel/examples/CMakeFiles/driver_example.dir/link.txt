@@ -1,0 +1,1 @@
+/usr/bin/c++   -Wall -pedantic -Wall -pedantic -O2 -g -DNDEBUG  -rdynamic CMakeFiles/driver_example.dir/full_driver.cpp.o  -o driver_example  -Wl,-rpath,/home/pe/ws_rockpicker/build_isolated/ur_client_library/devel ../liburcl.so -lpthread 

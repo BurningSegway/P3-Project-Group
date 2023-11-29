@@ -1,0 +1,58 @@
+Performing C SOURCE FILE Test CMAKE_HAVE_LIBC_PTHREAD failed with the following output:
+Change Dir: /home/pe/ws_rockpicker/build_isolated/ur5_module/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make cmTC_14829/fast && /usr/bin/make -f CMakeFiles/cmTC_14829.dir/build.make CMakeFiles/cmTC_14829.dir/build
+make[1]: Entering directory '/home/pe/ws_rockpicker/build_isolated/ur5_module/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_14829.dir/src.c.o
+/usr/bin/cc   -DCMAKE_HAVE_LIBC_PTHREAD   -o CMakeFiles/cmTC_14829.dir/src.c.o   -c /home/pe/ws_rockpicker/build_isolated/ur5_module/CMakeFiles/CMakeTmp/src.c
+Linking C executable cmTC_14829
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_14829.dir/link.txt --verbose=1
+/usr/bin/cc  -DCMAKE_HAVE_LIBC_PTHREAD    -rdynamic CMakeFiles/cmTC_14829.dir/src.c.o  -o cmTC_14829 
+/usr/bin/ld: CMakeFiles/cmTC_14829.dir/src.c.o: in function `main':
+src.c:(.text+0x46): undefined reference to `pthread_create'
+/usr/bin/ld: src.c:(.text+0x52): undefined reference to `pthread_detach'
+/usr/bin/ld: src.c:(.text+0x63): undefined reference to `pthread_join'
+collect2: error: ld returned 1 exit status
+make[1]: *** [CMakeFiles/cmTC_14829.dir/build.make:87: cmTC_14829] Error 1
+make[1]: Leaving directory '/home/pe/ws_rockpicker/build_isolated/ur5_module/CMakeFiles/CMakeTmp'
+make: *** [Makefile:121: cmTC_14829/fast] Error 2
+
+
+Source file was:
+#include <pthread.h>
+
+void* test_func(void* data)
+{
+  return data;
+}
+
+int main(void)
+{
+  pthread_t thread;
+  pthread_create(&thread, NULL, test_func, NULL);
+  pthread_detach(thread);
+  pthread_join(thread, NULL);
+  pthread_atfork(NULL, NULL, NULL);
+  pthread_exit(NULL);
+
+  return 0;
+}
+
+Determining if the function pthread_create exists in the pthreads failed with the following output:
+Change Dir: /home/pe/ws_rockpicker/build_isolated/ur5_module/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make cmTC_175af/fast && /usr/bin/make -f CMakeFiles/cmTC_175af.dir/build.make CMakeFiles/cmTC_175af.dir/build
+make[1]: Entering directory '/home/pe/ws_rockpicker/build_isolated/ur5_module/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_175af.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=pthread_create   -o CMakeFiles/cmTC_175af.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-3.16/Modules/CheckFunctionExists.c
+Linking C executable cmTC_175af
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_175af.dir/link.txt --verbose=1
+/usr/bin/cc  -DCHECK_FUNCTION_EXISTS=pthread_create    -rdynamic CMakeFiles/cmTC_175af.dir/CheckFunctionExists.c.o  -o cmTC_175af  -lpthreads 
+/usr/bin/ld: cannot find -lpthreads
+collect2: error: ld returned 1 exit status
+make[1]: *** [CMakeFiles/cmTC_175af.dir/build.make:87: cmTC_175af] Error 1
+make[1]: Leaving directory '/home/pe/ws_rockpicker/build_isolated/ur5_module/CMakeFiles/CMakeTmp'
+make: *** [Makefile:121: cmTC_175af/fast] Error 2
+
+
+
