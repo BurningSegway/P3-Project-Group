@@ -1,1 +1,0 @@
-/usr/bin/c++   -Wall -pedantic -Wall -pedantic -O2 -g -DNDEBUG  -rdynamic CMakeFiles/tool_contact_example.dir/tool_contact_example.cpp.o  -o tool_contact_example  -Wl,-rpath,/home/pe/ws_rockpicker/build_isolated/ur_client_library/devel ../liburcl.so -lpthread 

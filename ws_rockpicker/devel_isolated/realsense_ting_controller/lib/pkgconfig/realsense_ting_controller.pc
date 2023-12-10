@@ -1,8 +1,0 @@
-prefix=/home/pe/ws_rockpicker/devel_isolated/realsense_ting_controller
-
-Name: realsense_ting_controller
-Description: Description of realsense_ting_controller
-Version: 0.0.0
-Cflags: -I/home/pe/ws_rockpicker/devel_isolated/realsense_ting_controller/include
-Libs: -L${prefix}/lib 
-Requires: 

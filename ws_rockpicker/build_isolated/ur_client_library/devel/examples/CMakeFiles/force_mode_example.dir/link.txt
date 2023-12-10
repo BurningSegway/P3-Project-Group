@@ -1,1 +1,0 @@
-/usr/bin/c++   -Wall -pedantic -Wall -pedantic -O2 -g -DNDEBUG  -rdynamic CMakeFiles/force_mode_example.dir/force_mode_example.cpp.o  -o force_mode_example  -Wl,-rpath,/home/pe/ws_rockpicker/build_isolated/ur_client_library/devel ../liburcl.so -lpthread 
