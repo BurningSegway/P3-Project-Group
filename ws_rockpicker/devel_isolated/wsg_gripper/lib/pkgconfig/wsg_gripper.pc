@@ -1,0 +1,8 @@
+prefix=/home/pe/ws_rockpicker/devel_isolated/wsg_gripper
+
+Name: wsg_gripper
+Description: Description of wsg_gripper
+Version: 0.0.0
+Cflags: -I/home/pe/ws_rockpicker/devel_isolated/wsg_gripper/include
+Libs: -L${prefix}/lib 
+Requires: rospy std_msgs message_runtime

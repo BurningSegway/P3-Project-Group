@@ -1,0 +1,10 @@
+(cl:defpackage wsg_gripper-srv
+  (:use )
+  (:export
+   "GRIPPERCOMMAND"
+   "<GRIPPERCOMMAND-REQUEST>"
+   "GRIPPERCOMMAND-REQUEST"
+   "<GRIPPERCOMMAND-RESPONSE>"
+   "GRIPPERCOMMAND-RESPONSE"
+  ))
+

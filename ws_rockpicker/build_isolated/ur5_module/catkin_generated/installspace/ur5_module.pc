@@ -1,0 +1,8 @@
+prefix=/home/pe/ws_rockpicker/install_isolated
+
+Name: ur5_module
+Description: Description of ur5_module
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 
