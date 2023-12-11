@@ -1,8 +1,0 @@
-prefix=/home/pe/ws_rockpicker/devel_isolated/moveit_calibration_plugins
-
-Name: moveit_calibration_plugins
-Description: Description of moveit_calibration_plugins
-Version: 0.1.0
-Cflags: -I/home/pe/ws_rockpicker/src/moveit_calibration/moveit_calibration_plugins/handeye_calibration_target/include -I/home/pe/ws_rockpicker/src/moveit_calibration/moveit_calibration_plugins/handeye_calibration_solver/include -I/usr/include/eigen3
-Libs: -L${prefix}/lib 
-Requires: roscpp sensor_msgs

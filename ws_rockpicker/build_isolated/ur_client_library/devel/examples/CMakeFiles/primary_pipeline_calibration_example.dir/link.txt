@@ -1,1 +1,0 @@
-/usr/bin/c++   -Wall -pedantic -Wall -pedantic -O2 -g -DNDEBUG  -rdynamic CMakeFiles/primary_pipeline_calibration_example.dir/primary_pipeline_calibration.cpp.o  -o primary_pipeline_calibration_example  -Wl,-rpath,/home/pe/ws_rockpicker/build_isolated/ur_client_library/devel ../liburcl.so -lpthread 
