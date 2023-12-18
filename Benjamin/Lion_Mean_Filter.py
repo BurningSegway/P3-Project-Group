@@ -2,7 +2,7 @@ import cv2 as cv
 import numpy as np
 
 BGR_Image = cv.imread('Benjamin\lion.jpg')
-x,y = (100,100)
+x,y = (10,10)
 mean_Filter = np.ones((x,y), np.float32)/25
 L,B,D = BGR_Image.shape
 b,g,r = cv.split(BGR_Image)
