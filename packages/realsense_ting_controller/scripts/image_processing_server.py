@@ -17,28 +17,32 @@ stamp = str(date_time.year)+'_'+str(date_time.month)+'_'+str(date_time.day)+'_'+
 number = 1
 
 def process_image(data):
-    print(image_command_client("Capture"))
+    print(image_command_client("Capture")) #Call the service capture_command, that will take pciture and save it
 
-    rospy.sleep(0.5)
+    rospy.sleep(0.5) #Sleep, to ensure the image has time to be saved properly, before loading it
 
     #Load image and get image dimensions
     image = cv.imread("/home/pe/ws_rockpicker/src/realsense_ting_controller/scripts/Image.jpg") #Load the image with OpenCV
     #image = cv.resize(image, (1280, 720)) #resize if you want to look at the pictures, for actual coordinates, uncomment
     
-
+    #Extract the request from the service message
     cmd = data.request
 
+    #If the command is Process, then begin processing the image
     if cmd == "Process":
         print("Process image")
 
         main_thresh = 63 #Threshold for saturation channel, passed as the second variable in the Preproccesing function
 
-        SortedEllipse = process_main(image, main_thresh)
+        SortedEllipse = process_main(image, main_thresh) #Start the main processing.
+
+        #Used for debugging and general info
         print(SortedEllipse)
         print(GetList(SortedEllipse, 1, 0))
 
         #print(GetList(2,1))
 
+        #Convert the list returned into a more managable array, insstead of a list of tuples, which a unhandy to work with.
         list = GetList(SortedEllipse, 1,0)
         array1 = list[0]
         array2 = list[1]
@@ -57,19 +61,18 @@ def process_image(data):
 
         #cv.destroyAllWindows()#
 
+        #As a response to the service call return an array containg the center of the ellipse in pixel coordinates, the shortest and longest axis in pixels, and the angle of the shortest axis, compared to the world x axis [(x,y),(short,long),theta]
         return ImgProcResponse(arrayproper)
 
 def main():
 
-    rospy.init_node('image_processor_server', anonymous=True)
+    rospy.init_node('image_processor_server', anonymous=True) #Init node
 
-    s = rospy.Service('process_image', ImgProc, process_image)
+    s = rospy.Service('process_image', ImgProc, process_image) #Declare the service, with the name, service message, and the function to handle the service request.
     print("Ready to recieve command")
 
-
-
     try:
-        rospy.spin()
+        rospy.spin() #Keeps python from exiting the program, unless the node is shutdown
     except KeyboardInterrupt:
         print("Shutting down")
     cv.destroyAllWindows()
@@ -105,6 +108,8 @@ def Preproccesing(image, threshold):
     global number
     global stamp
 
+
+    #Save images from interesting parts of the image processing
     filename = '/home/pe/ws_rockpicker/src/realsense_ting_controller/scripts/final_test/Image_contour_'+str(stamp)+'_'+str(number)+'.jpg'
     cv.imwrite(filename, contour_img)
     #cv.waitKey(0)#
@@ -280,6 +285,7 @@ def process_main(image, threshold):
     global number
     global stamp
     
+    #Save the ellipse pictures.
     filename = '/home/pe/ws_rockpicker/src/realsense_ting_controller/scripts/Image_ellipse.jpg'
     cv.imwrite(filename, image_small)
     filename = '/home/pe/ws_rockpicker/src/realsense_ting_controller/scripts/final_test/Image_ellipse_'+str(stamp)+'_'+str(number)+'.jpg'
@@ -297,17 +303,17 @@ def GetList(a, x, y): #Function for getting the ellipses from the sorted list
     if y == 1: #If the y value is 1, return the ellipse at the x value
         return SortedEllipse[x]
     
-def image_command_client(c):
+def image_command_client(c): #This function handles the request call to the camera_server
 
-    rospy.wait_for_service('capture_command')
+    rospy.wait_for_service('capture_command') #Wait for the service to be available
 
     try:
-        gripper_commands = rospy.ServiceProxy('capture_command', ImageCapture)
-        resp = gripper_commands(c)
-        return resp.response
+        gripper_commands = rospy.ServiceProxy('capture_command', ImageCapture) #Declare what type of service message to use, and to what service the request is sent
+        resp = gripper_commands(c) #Create the request, and call the service
+        return resp.response #Ectract the response part from the returned message, and return it
 
     except rospy.ServiceException:
         print("Service call failed :(")
  
-if __name__ == '__main__':
-    main()
+if __name__ == '__main__': #this checks is the file is run as a script, as it should. And would return false if it was imported as a module
+    main() #run main function
