@@ -20,7 +20,7 @@ class image_converter:
         self.image_pub = rospy.Publisher("image_topic_2",Image)
         self.bridge = CvBridge()
         self.message_sub = rospy.Subscriber("/image_capture_topic", String, self.callback1, queue_size=1000)
-        #self.image_sub = rospy.Subscriber("/camera/depth/image_rect_raw",Image,self.callback, queue_size=1000)
+        self.image_sub_depth = rospy.Subscriber("/camera/depth/image_rect_raw",Image,self.callback, queue_size=1000)
         self.image_sub = rospy.Subscriber("/camera/color/image_raw",Image,self.callback, queue_size=1000)
         self.number = 0
 
