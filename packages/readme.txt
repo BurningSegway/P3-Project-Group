@@ -1,4 +1,5 @@
 3rd semester project: Automatic sensing of the enviornment
+ROB3 group 367 - Benjamin B. Jørgensen, Minik Heilmann, Morten Sørensen, Nicklas A. Deding, Pierre E. Mortensen 
 
 Here is what you need to do in order to run the system on an UR5 robotic manipulator equipped with an Intel RealSense D435 camera. It is assumed that ROS Noetic is installed.
 
@@ -169,5 +170,5 @@ In some of the pictures, a ArUco marker board is visible, if you want to do your
 
 The dpeth images are 16 bit, so this has to be kept in mind, if the images are to be opened and processed correctly. The pixel values in the depth image should represesnt the distance from the camera to the object in millimeters.
 
-
+-----
 
