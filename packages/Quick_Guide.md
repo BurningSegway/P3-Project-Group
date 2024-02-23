@@ -49,7 +49,7 @@ Når det grønne er væk, start rqt dynamic reconfigure
 ```sh
 rqt
 ```
-Plugins -> Dynamic Reconfigure ->
+Plugins -> Dynamic Reconfigure -> camera -> rgb_camera
 
 Fjern auto whitebalance, og kør slideren helt i bund.
 Sæt brightness til 22
@@ -108,3 +108,4 @@ Hvis efter et nødstop at griberen er lukket, så skal den åbnes igen inden den
 rosservice call
 ```
 
+Man kan holde øje med, om thresholden holder, ved at kigge på det thresholded billede om der kommer store hvide plamager. Den kan ændres i image_processing_server.py På linje 34 i scriptet er der en variable der hedder main_thresh, juster den med 5 værdier adgangen, for at se om det gør en forskel.
