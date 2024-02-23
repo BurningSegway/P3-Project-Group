@@ -6,7 +6,7 @@ Tilslut PC med static ip adresse til UR. UR'en forventer at PC'en har ip adresse
 Åbn terminal og skriv:
 
 ```sh
-roslaunch ur_robot_driver ur5_bringup.launch robot_ip:=<robot_ip> \
+roslaunch ur_robot_driver ur5_bringup.launch robot_ip:=192.168.1.15 \
   kinematics_config:="/home/robotlab/Desktop/my_robot_calibration.yaml"
 ```
 
@@ -98,9 +98,11 @@ Man kan heldigvis lade alt det andet køre i baggrunden, og så starte det her s
 
 ## Gode ting at vide
 
-Hvis den går i nødstop, så afslut get_poses scriptet, og start det igen, og tryk enter, sådan at den sender kommando til at bevæge robotten tilbage til start. Det kan ske ellers at når man starter robotten op igen, at den forsætter med at køre den vej, som fik den til at gå i nødstop.
+Robotten kan ikke føres med hånden, så længe at rockpicker programmet kører, ønsker man at styre den med hånden stoppes programmet, og når ROS skal overtage igen startes det igen.
 
-Hvis efter et nødstop at griberen er lukket, så skal den åbnes igen inden, den bliver sat igang igen, det gøres ved et service kald:
+Hvis den går i nødstop, så afslut get_poses scriptet, og start det igen, og tryk enter, sådan at den sender kommando til at bevæge robotten tilbage til start. Det kan ske ellers at når man starter robotten op igen, at den forsætter med at køre den vej, som fik den til at gå i nødstop, og så gør den det bare igen.
+
+Hvis efter et nødstop at griberen er lukket, så skal den åbnes igen inden den bliver sat igang igen, det gøres ved et service kald:
 
 ```sh
 rosservice call
