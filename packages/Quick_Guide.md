@@ -88,6 +88,18 @@ rosrun realsense_ting_controller image_processing_server.py
 
 Åbn terminal
 
+Test threshold værdier inden robotten sættes igang, dette gøres ved at kalde process servicen:
+
+```sh
+rosservice call /process_image "Process"
+```
+Det nemmeste er at åbne billedet Image_thresh.jpg i visual studio når billedet ligner at stenene er nogenlunde defineret uden alt for meget støj omkring har du fundet en god værdi.
+![Thresholded image](Image_thresh.jpg "Thresholded image")
+
+### 8
+
+Åbn terminal
+
 Når alt er startet op korrekt og det opfører sig ordenligt, så kan hoved scriptet startes. Der skal være sten tilstede i billedet ellers crasher billedbehandling serveren (Ik så smart, det ved vi godt).
 
 ```sh
