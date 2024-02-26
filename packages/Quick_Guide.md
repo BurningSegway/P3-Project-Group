@@ -105,7 +105,7 @@ Hvis den går i nødstop, så afslut get_poses scriptet, og start det igen, og t
 Hvis efter et nødstop at griberen er lukket, så skal den åbnes igen inden den bliver sat igang igen, det gøres ved et service kald:
 
 ```sh
-rosservice call
+rosservice call /gripper_commands "home"
 ```
 
 Man kan holde øje med, om thresholden holder, ved at kigge på det thresholded billede om der kommer store hvide plamager. Den kan ændres i image_processing_server.py På linje 34 i scriptet er der en variable der hedder main_thresh, juster den med 5 værdier adgangen, for at se om det gør en forskel.
