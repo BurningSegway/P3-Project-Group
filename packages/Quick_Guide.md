@@ -1,6 +1,6 @@
 # Hurtig guide til at få sat robotten op, samt lidt ekstra info
 ## Opstart af robot og noder
-### 1
+### 1 Tilslut PC til UR'en
 Tilslut PC med static ip adresse til UR. UR'en forventer at PC'en har ip adresse 192.168.1.25
 
 Åbn terminal og skriv:
@@ -12,7 +12,7 @@ roslaunch ur_robot_driver ur5_bringup.launch robot_ip:=192.168.1.15 \
 
 På UR'en startes 'rockpicker' programmet, og nu skulle terminalen gerne melde tilbage
 
-### 2
+### 2 Start MoveIt planner og ur5 config i Rviz
 
 Åbn terminal
 
@@ -30,7 +30,7 @@ Start Rviz
 roslaunch ur5_moveit_config moveit_rviz.launch
 ```
 
-### 3
+### 3 Start af RealSense kamera, og konfigurering heraf
 
 Åbn terminal
 
@@ -54,7 +54,7 @@ Plugins -> Dynamic Reconfigure -> camera -> rgb_camera
 Fjern auto whitebalance, og kør slideren helt i bund.
 Sæt brightness til 22
 
-### 4
+### 4 Start gripper server
 
 Åbn terminal 
 
@@ -64,7 +64,7 @@ Start gripper command server
 rosrun wsg_gripper gripper_command_server2.py
 ```
 
-### 5
+### 5 Start kamera server
 
 Åbn terminal
 
@@ -74,7 +74,7 @@ Start camera server
 rosrun realsense_ting_controller camera_server.py
 ```
 
-### 6
+### 6 Start billedbandling server
 
 Åbn terminal
 
@@ -84,9 +84,11 @@ Start billedbehandling server
 rosrun realsense_ting_controller image_processing_server.py
 ```
 
-### 7
+### 7 Indstilling af threshold
 
 Åbn terminal
+
+For at ændre threshold værdien gå til linje 34 i image_processing_server.py
 
 Test threshold værdier inden robotten sættes igang, dette gøres ved at kalde process servicen:
 
@@ -96,7 +98,7 @@ rosservice call /process_image "Process"
 Det nemmeste er at åbne billedet Image_thresh.jpg i visual studio når billedet ligner at stenene er nogenlunde defineret uden alt for meget støj omkring har du fundet en god værdi.
 ![Thresholded image](Image_thresh.jpg "Thresholded image")
 
-### 8
+### 8 Start autonom kørsel af robotten
 
 Åbn terminal
 
