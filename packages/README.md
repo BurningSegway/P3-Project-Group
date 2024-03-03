@@ -5,10 +5,13 @@
 - Minik Heilmann
 - Morten Sørensen
 - Nicklas A. Deding
-- Pierre E. Mortensen 
+- Pierre E. Mortensen
+
+### Maintainer
+- Pierre E. Mortensen
 
 
-Here is what you need to do in order to run the system on an UR5 robotic manipulator equipped with an Intel RealSense D435 camera. It is assumed that ROS Noetic is installed.
+Here is what you need to do in order to run the system on a UR5 robotic manipulator equipped with an Intel RealSense D435 camera. It is assumed that ROS Noetic is installed.
 
 ## PC Setup
 On your PC setup your wired connection as a static IP.
@@ -30,6 +33,7 @@ catkin_make
 
 ## Preparing the UR5 Robot
 Now the robot itself must be prepared, for this a URCap must be installed on the UR pendant. The newest version of the URCap can be found here: https://github.com/UniversalRobots/Universal_Robots_ExternalControl_URCap/releases
+
 Then the URCap must be installed on the robot according to: https://github.com/UniversalRobots/Universal_Robots_ROS_Driver/blob/master/ur_robot_driver/doc/install_urcap_cb3.md
 
 Copy the URCap file onto a USB drive and insert it into the UR pendant. From the welcome screen on the pendant navigate to: Setup Robot -> URCaps. Here click on the plus sign, select the URCap from the USB drive and click open. Restart the robot when promted to.
@@ -106,9 +110,15 @@ catkin_make
 ```
 
 ## Workspace Setup
-Now copy the following packages into your workspace src folder: realsense_ting_controller, ur5_module and wsg_gripper.
+Get the packages for this project by cloning the rep. onto your PC, this makes copying the packages easier.
 
-You can also copy the joint_limits_corrected.yaml this will be used to limit the manipulators joints, as to avoid solutions to the motion planning that would cause the manipulator to do a configuration change. Navigate to: universal_robot -> ur_description -> config -> ur5 in here, replace the joint_limits.yaml, with the one you copied, and rename it to joint_limits.yaml
+```sh
+git clone https://github.com/BurningSegway/P3-Project-Group.git
+```
+
+Now from the 'packages' folder copy the following packages into your workspace src folder: realsense_ting_controller, ur5_module and wsg_gripper.
+
+You can also copy the joint_limits_corrected.yaml this will be used to limit the manipulators joints, as to avoid solutions to the motion planning that would cause the manipulator to do a configuration change. In your workspace src folder navigate to: universal_robot -> ur_description -> config -> ur5 in here, replace the joint_limits.yaml, with the one you copied, and rename it to joint_limits.yaml
 
 Then go to the workspace home folder, and build.
 
@@ -117,7 +127,7 @@ catkin_make
 ```
 
 ## Intel Realsense Camera Setup
-To get the Intel Realsense camera up and running, install the realsense package according to:https://github.com/IntelRealSense/realsense-ros/tree/ros1-legacy
+To get the Intel Realsense camera up and running, install the realsense package according to: https://github.com/IntelRealSense/realsense-ros/tree/ros1-legacy
 
 ```sh
 sudo apt-get install ros-$ROS_DISTRO-realsense2-camera
@@ -258,7 +268,7 @@ In some of the pictures, a ArUco marker board is visible, if you want to do your
 
 The depth images are 16 bit, so this has to be kept in mind, if the images are to be opened and processed correctly. The pixel values in the depth image should represesnt the distance from the camera to the object in millimeters.
 
-The manipulator cannot be controlled with the pendant while the rockpicker program is running on the pendant. To move it by hand, pause or stop the program, once finished start the program again, and ROS can once again control the manipulator.
+The manipulator cannot be controlled with the pendant while the program you created on the UR earlier is running. To move it by hand, pause or stop the program, once finished moving it by hand, start the program again, and ROS can once again control the manipulator.
 
 If the robot crashes with the enviornment and goes into stop. Kill the get_poses node, and start it again, press enter to send a command to move the manipulator into the home position, then engage the robot again. If this is not done, the robot might contiune the path that made it crash, going into stop again.
 
