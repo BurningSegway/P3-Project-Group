@@ -20,7 +20,7 @@ The UR5 must be able to communicate with ROS, so a UR ROS driver must be install
 sudo apt install ros-noetic-ur-robot-driver
 ```
 
-If this doesnt work, you might need to install it from source into your catkin src folder, please refer to the link for this guide.
+We recommend installing it from source though into your catkin src folder, please refer to the link for this guide. This will make it a lot easier to modify the yaml files for the UR robot, like joint limits, which you will need to modify, or copy ours, as described later on in this README, to make the robot function more reliable.
 
 Build your workspace
 
@@ -95,12 +95,22 @@ If there are dependencies not yet installed ROS can install them by:
 rosdep install -y --from-paths . --ignore-src --rosdistro noetic
 ```
 
-Then build the workspace
+Then go to the workspace home folder, and build.
+
+```sh
+catkin_make
+```
 
 ## Workspace Setup
 Now copy the following packages into your workspace src folder: realsense_ting_controller, ur5_module and wsg_gripper.
 
 You can also copy the joint_limits_corrected.yaml this will be used to limit the manipulators joints, as to avoid solutions to the motion planning that would cause the manipulator to do a configuration change. Navigate to: universal_robot -> ur_description -> config -> ur5 in here, replace the joint_limits.yaml, with the one you copied, and rename it to joint_limits.yaml
+
+Then go to the workspace home folder, and build.
+
+```sh
+catkin_make
+```
 
 ## Intel Realsense Camera Setup
 To get the Intel Realsense camera up and running, install the realsense package according to:https://github.com/IntelRealSense/realsense-ros/tree/ros1-legacy
@@ -115,7 +125,7 @@ That should be it, to test out the camera, launch it:
 roslaunch realsense2_camera rs_camera.launch
 ```
 
-An easy way of seeing if the camera is publishing images, is to launch RViz, and add a view form topic, and selcet color image raw topic.
+An easy way of seeing if the camera is publishing images, is to launch RViz, and add a view from topic, and selcet color image raw topic.
 
 ## Eye-in-Hand Calibration
 The last thing that should be done, is to do a eye-in-hand calibration. Since there could be a difference in the setup used in this project, and yours setup. For this purpose MovieIt has a calibration package, that provides a graphical interface for this in RViz. To install the package according to: https://ros-planning.github.io/moveit_tutorials/doc/hand_eye_calibration/hand_eye_calibration_tutorial.html
@@ -132,7 +142,11 @@ Then make sure all the dependencies are installed:
 rosdep install -y --from-paths . --ignore-src --rosdistro melodic
 ```
 
-Build your workspace.
+Then go to the workspace home folder, and build.
+
+```sh
+catkin_make
+```
 
 Launch RViz with the UR demo:
 
@@ -172,9 +186,9 @@ roslaunch ur_robot_driver ur5_bringup.launch robot_ip:=<robot_ip> \
   kinematics_config:="${HOME}/my_robot_calibration.yaml"
 ```
   
-Where you enter the robots IP adress and the path to the extrated robot calibration.
+Where you enter the robots IP adress and the path to the extracted robot calibration.
 
-Then in the program on the UR pendant created earlier with only the ExterControl node in, press run, and the terminal should say it is connected.
+Then in the program on the UR pendant created earlier with only the ExternalControl node in, press run, and the terminal should say it is connected.
 
 In a new terminal enter:
 
@@ -212,6 +226,17 @@ Then start the image proccesor server in a new terminal:
 rosrun realsense_ting_controller image_processing_server.py
 ```
 
+To set the correct threshold value open a new terminal and call the service as below:
+
+```sh
+rosservice call /process_image "Process"
+```
+To edit the threshold value, navigate to line 35 in image_processing_server.py in the realsense_ting_controller package.
+
+In the same package find and open Image_thresh.jpg, when the rocks in the image is well defined, without too much noise in the background, then you have found a good threshold value. Note that the image processing pipeline can handle quite a bit of noise. Below is shown an optimal image, which is very useable for the pipeline.
+
+![Thresholded image](Image_thresh.jpg "Thresholded image")
+
 And finally, once all the required nodes are started, run the get poses script in a new terminal:
 
 ```sh
@@ -229,3 +254,12 @@ In some of the pictures, a ArUco marker board is visible, if you want to do your
 
 The depth images are 16 bit, so this has to be kept in mind, if the images are to be opened and processed correctly. The pixel values in the depth image should represesnt the distance from the camera to the object in millimeters.
 
+The manipulator cannot be controlled with the pendant while the rockpicker program is running on the pendant. To move it by hand, pause or stop the program, once finished start the program again, and ROS can once again control the manipulator.
+
+If the robot crashes with the enviornment and goes into stop. Kill the get_poses node, and start it again, press enter to send a command to move the manipulator into the home position, then engage the robot again. If this is not done, the robot might contiune the path that made it crash, going into stop again.
+
+If the robot happens to crash, and the gripper is closed, you need to open the gripper again, before starting the robot again, to do so call the service as below:
+
+```sh
+rosservice call /gripper_commands "home"
+```
