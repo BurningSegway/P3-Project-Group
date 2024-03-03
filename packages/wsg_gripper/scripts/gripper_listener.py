@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 #This listener is not used, but was the first succesful attempt, to control the gripper through ROS
 

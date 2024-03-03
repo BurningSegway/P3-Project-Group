@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #This script will publish the scene transform, so it can be visualized in RViz.
 
 import rospy

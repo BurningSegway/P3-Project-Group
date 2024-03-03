@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #Script that listens to the camera info topic, used for debugging.
 
 import rospy

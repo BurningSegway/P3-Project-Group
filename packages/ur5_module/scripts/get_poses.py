@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 #The get_poses script, is the main script of the implementation. This script is started when the robot should do its thing, this script is responsible for making the robot move, calling the appropriete services, to operate the gripper, and process images.
 
