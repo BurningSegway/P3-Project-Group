@@ -22,7 +22,11 @@ sudo apt install ros-noetic-ur-robot-driver
 
 We recommend installing it from source though into your catkin src folder, please refer to the link for this guide. This will make it a lot easier to modify the yaml files for the UR robot, like joint limits, which you will need to modify, or copy ours, as described later on in this README, to make the robot function more reliable.
 
-Build your workspace
+Then go to the workspace home folder, and build.
+
+```sh
+catkin_make
+```
 
 ## Preparing the UR5 Robot
 Now the robot itself must be prepared, for this a URCap must be installed on the UR pendant. The newest version of the URCap can be found here: https://github.com/UniversalRobots/Universal_Robots_ExternalControl_URCap/releases
@@ -30,7 +34,7 @@ Then the URCap must be installed on the robot according to: https://github.com/U
 
 Copy the URCap file onto a USB drive and insert it into the UR pendant. From the welcome screen on the pendant navigate to: Setup Robot -> URCaps. Here click on the plus sign, select the URCap from the USB drive and click open. Restart the robot when promted to.
 
-After the reboot 'External Control' should be visible inside the installation section, once you have pressed program robot from the welcome screen. 
+After the reboot 'External Control' should be visible inside the installation section, once you have pressed 'Program robot' from the welcome screen. 
 
 Select 'External Control' and enter the IP of the PC that will run the ROS driver. Leave the custom port as is.
 
