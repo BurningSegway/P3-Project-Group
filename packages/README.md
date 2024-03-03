@@ -7,7 +7,7 @@
 - Nicklas A. Deding
 - Pierre E. Mortensen
 
-### Maintainer
+### Maintainer(s):
 - Pierre E. Mortensen
 
 
