@@ -90,7 +90,7 @@ def Preproccesing(image, threshold):
 
     # Thresholding the saturation channel, 
     thresholded = cv.threshold(S, threshold, 255, cv.THRESH_BINARY)[1] #Thresholding the saturation channel with a variable threshold
-    thresholded = cv.bitwise_not(thresholded) #Inverting the thresholded image as the rocks are dark and the background is light
+    thresholded = cv.bitwise_not(thresholded) #Inverting the thresholded image as the rocks are dark and the background is light, if the rocks show up as black and the background as white in the thresholded image, comment out this line
     #cv.imshow("Thresholded", thresholded) #Debugging
     #cv.waitKey(0) #Debugging
     
