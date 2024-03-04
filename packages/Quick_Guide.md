@@ -1,4 +1,5 @@
 # Hurtig guide til at få sat robotten op, samt lidt ekstra info
+Udgangspunktet er at alt er installeret jf. README
 ## Opstart af robot og noder
 ### 1 Tilslut PC til UR'en
 Tilslut PC med static ip adresse til UR. UR'en forventer at PC'en har ip adresse 192.168.1.25
