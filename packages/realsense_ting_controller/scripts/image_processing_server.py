@@ -22,7 +22,7 @@ def process_image(data):
     rospy.sleep(0.5) #Sleep, to ensure the image has time to be saved properly, before loading it
 
     #Load image and get image dimensions
-    image = cv.imread("/home/pe/ws_rockpicker/src/realsense_ting_controller/scripts/Image.jpg") #Load the image with OpenCV
+    image = cv.imread("/home/robotlab/ws_rockpicker/src/rockpicker/realsense_ting_controller/scripts/Image.jpg") #Load the image with OpenCV
     #image = cv.resize(image, (1280, 720)) #resize if you want to look at the pictures, for actual coordinates, uncomment
     
     #Extract the request from the service message
@@ -108,19 +108,17 @@ def Preproccesing(image, threshold):
     global number
     global stamp
 
-
-    #Save images from interesting parts of the image processing
-    filename = '/home/pe/ws_rockpicker/src/realsense_ting_controller/scripts/final_test/Image_contour_'+str(stamp)+'_'+str(number)+'.jpg'
+    filename = '/home/robotlab/ws_rockpicker/src/rockpicker/realsense_ting_controller/scripts/final_test/Image_contour_'+str(stamp)+'_'+str(number)+'.jpg'
     cv.imwrite(filename, contour_img)
     #cv.waitKey(0)#
 
-    filename = '/home/pe/ws_rockpicker/src/realsense_ting_controller/scripts/Imagecont.jpg'
+    filename = '/home/robotlab/ws_rockpicker/src/rockpicker/realsense_ting_controller/scripts/Imagecont.jpg'
     cv.imwrite(filename, contour_img)
 
-    filename = '/home/pe/ws_rockpicker/src/realsense_ting_controller/scripts/Image_thresh.jpg'
+    filename = '/home/robotlab/ws_rockpicker/src/rockpicker/realsense_ting_controller/scripts/Image_thresh.jpg'
     cv.imwrite(filename, thresholded)
 
-    filename = '/home/pe/ws_rockpicker/src/realsense_ting_controller/scripts/final_test/Image_threshholded_'+str(stamp)+'_'+str(number)+'.jpg'
+    filename = '/home/robotlab/ws_rockpicker/src/rockpicker/realsense_ting_controller/scripts/final_test/Image_threshholded_'+str(stamp)+'_'+str(number)+'.jpg'
     cv.imwrite(filename, thresholded)
 
     return contours, contour_img #Returning the contours and the mask with the contours drawn on it
@@ -241,7 +239,7 @@ def process_main(image, threshold):
     cv.drawContours(MultipleRockImg, MultipleRocks, -1, (255, 255, 255), -1) #Drawing the contours of the multiple rocks on the mask
     cv.drawContours(SingleRockImg, SingleRock, -1, (255, 255, 255), -1) #Drawing the contours of the single rocks on the mask
 
-    filename = '/home/pe/ws_rockpicker/src/realsense_ting_controller/scripts/Image_Rocks.jpg' 
+    filename = '/home/robotlab/ws_rockpicker/src/rockpicker/realsense_ting_controller/scripts/Image_Rocks.jpg' 
     cv.imwrite(filename, MultipleRockImg)
     #cv.imshow("MultipleRockImg", MultipleRockImg)#
     #cv.imshow("SingleRockImg", SingleRockImg)#
@@ -286,9 +284,9 @@ def process_main(image, threshold):
     global stamp
     
     #Save the ellipse pictures.
-    filename = '/home/pe/ws_rockpicker/src/realsense_ting_controller/scripts/Image_ellipse.jpg'
+    filename = '/home/robotlab/ws_rockpicker/src/rockpicker/realsense_ting_controller/scripts/Image_ellipse.jpg'
     cv.imwrite(filename, image_small)
-    filename = '/home/pe/ws_rockpicker/src/realsense_ting_controller/scripts/final_test/Image_ellipse_'+str(stamp)+'_'+str(number)+'.jpg'
+    filename = '/home/robotlab/ws_rockpicker/src/rockpicker/realsense_ting_controller/scripts/final_test/Image_ellipse_'+str(stamp)+'_'+str(number)+'.jpg'
     cv.imwrite(filename, image3)
 
     number += 1

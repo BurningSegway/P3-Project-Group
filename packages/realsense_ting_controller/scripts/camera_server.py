@@ -72,9 +72,9 @@ def callback(data): #Function that handles the Image messages from the color ima
 
     
     number +=1 #iterate the number variable, used to name images uniquely
-    filename = '/home/pe/ws_rockpicker/src/realsense_ting_controller/scripts/Image.jpg' #An image is save just as Image.jpg, because it will be overwritten each time a new image is taken, this way the image processor server only uses the newest image.
+    filename = '/home/robotlab/ws_rockpicker/src/rockpicker/realsense_ting_controller/scripts/Image.jpg' #An image is save just as Image.jpg, because it will be overwritten each time a new image is taken, this way the image processor server only uses the newest image.
     cv2.imwrite(filename, cv_image)
-    filename = '/home/pe/ws_rockpicker/src/realsense_ting_controller/scripts/final_test/Image_'+str(stamp)+'_'+str(number)+'.jpg' #For the sake of saving all the images taken, each image taken is also saved with a unique name, in a different folder.
+    filename = '/home/robotlab/ws_rockpicker/src/rockpicker/realsense_ting_controller/scripts/final_test/Image_'+str(stamp)+'_'+str(number)+'.jpg' #For the sake of saving all the images taken, each image taken is also saved with a unique name, in a different folder.
     cv2.imwrite(filename, cv_image)
     image_sub.unregister() #Unsubscribe from the image topic, this is neccessary because once it has subscirbed to the topic, there is always new pictures incoming, and thus this will save images until the node is stopped, and the purpose is to only save 1 image, the newest one.
     #cv2.imshow("wow", cv_image)
@@ -100,7 +100,7 @@ def callback1(data): #Function that handle the Image message from the depth imag
 
     
     number_depth +=1
-    filename = '/home/pe/ws_rockpicker/src/realsense_ting_controller/scripts/final_test/Image_depth_'+str(stamp)+'_'+str(number_depth)+ '.png'
+    filename = '/home/robotlab/ws_rockpicker/src/rockpicker/realsense_ting_controller/scripts/final_test/Image_depth_'+str(stamp)+'_'+str(number_depth)+ '.png'
     cv2.imwrite(filename, cv_image)
     depth_sub.unregister()
     #print(cv_image.shape)
