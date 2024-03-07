@@ -97,7 +97,7 @@ Test threshold værdier inden robotten sættes igang, dette gøres ved at kalde 
 rosservice call /process_image "Process"
 ```
 Det nemmeste er at åbne billedet Image_thresh.jpg i visual studio når billedet ligner at stenene er nogenlunde defineret uden alt for meget støj omkring har du fundet en god værdi.
-![Thresholded image](Image_thresh.jpg "Thresholded image")
+![Thresholded image](./docs/Image_thresh.jpg "Thresholded image")
 
 ### 8 Start autonom kørsel af robotten
 

@@ -249,7 +249,7 @@ To edit the threshold value, navigate to line 35 in image_processing_server.py i
 
 In the same package find and open Image_thresh.jpg, when the rocks in the image is well defined, without too much noise in the background, then you have found a good threshold value. Note that the image processing pipeline can handle quite a bit of noise. Below is shown an optimal image, which is very useable for the pipeline.
 
-![Thresholded image](Image_thresh.jpg "Thresholded image")
+![Thresholded image](./docs/Image_thresh.jpg "Thresholded image")
 
 And finally, once all the required nodes are started, run the get poses script in a new terminal:
 
