@@ -108,6 +108,7 @@ def Preproccesing(image, threshold):
     global number
     global stamp
 
+    #Save images from interesting parts of the image processing
     filename = '/home/robotlab/ws_rockpicker/src/rockpicker/realsense_ting_controller/scripts/final_test/Image_contour_'+str(stamp)+'_'+str(number)+'.jpg'
     cv.imwrite(filename, contour_img)
     #cv.waitKey(0)#
