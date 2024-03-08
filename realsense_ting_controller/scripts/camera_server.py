@@ -5,6 +5,9 @@
 #import modules and message dependencies
 from __future__ import print_function
 
+import os
+import rospkg
+
 import roslib
 roslib.load_manifest('realsense_ting_controller')
 import sys
@@ -28,8 +31,17 @@ last_number = ''
 number = 0
 number_depth = 0
 
-image_sub = ''
-depth_sub = ''
+image_subscriber = ''
+depth_subscriber = ''
+
+
+# Find package path
+ros_package_path = rospkg.RosPack().get_path('realsense_ting_controller')
+
+# Constructing file path dynamically
+image_dir = os.path.join(ros_package_path, 'scripts')
+final_test_dir = os.path.join(image_dir, 'final_test')
+os.makedirs(final_test_dir, exist_ok=True)  # Create directory if it doesn't exist, no error if it already exists
 
 
 
@@ -41,11 +53,11 @@ def image_converter(data): #function for handling requests
     if cmd == "Capture": #if the request is "Capture" capture an image
 
         #initiliaze to global variables in the function scope, so they can be saved and used in other functions
-        global image_sub
-        global depth_sub
+        global image_subscriber
+        global depth_subscriber
 
-        image_sub = rospy.Subscriber("/camera/color/image_raw",Image,callback, queue_size=1) #Subscribe to the color image topic, and send the image to callback function
-        depth_sub = rospy.Subscriber("/camera/depth/image_rect_raw",Image,callback1, queue_size=1000) #Subscribe to the depth image topic, and send the image to the callback1 function
+        image_subscriber = rospy.Subscriber("/camera/color/image_raw",Image,callback, queue_size=1) #Subscribe to the color image topic, and send the image to callback function
+        depth_subscriber = rospy.Subscriber("/camera/depth/image_rect_raw",Image,callback1, queue_size=1000) #Subscribe to the depth image topic, and send the image to the callback1 function
         
         #Let user know the images have been captured.
         print("Image captured")
@@ -60,7 +72,7 @@ def callback(data): #Function that handles the Image messages from the color ima
     #initalize variables in function scope
     global stamp
     global number
-    global image_sub
+    global image_subscriber
 
     bridge = CvBridge() #The CvBridge can convert and image from the Image msg to openCV format
 
@@ -72,11 +84,15 @@ def callback(data): #Function that handles the Image messages from the color ima
 
     
     number +=1 #iterate the number variable, used to name images uniquely
-    filename = '/home/robotlab/ws_rockpicker/src/rockpicker/realsense_ting_controller/scripts/Image.jpg' #An image is save just as Image.jpg, because it will be overwritten each time a new image is taken, this way the image processor server only uses the newest image.
-    cv2.imwrite(filename, cv_image)
-    filename = '/home/robotlab/ws_rockpicker/src/rockpicker/realsense_ting_controller/scripts/final_test/Image_'+str(stamp)+'_'+str(number)+'.jpg' #For the sake of saving all the images taken, each image taken is also saved with a unique name, in a different folder.
-    cv2.imwrite(filename, cv_image)
-    image_sub.unregister() #Unsubscribe from the image topic, this is neccessary because once it has subscirbed to the topic, there is always new pictures incoming, and thus this will save images until the node is stopped, and the purpose is to only save 1 image, the newest one.
+
+    # Constructing file names
+    temp_image_path = os.path.join(image_dir, 'Image.jpg')  # Temporary image path
+    unique_image_path = os.path.join(final_test_dir, f'Image_{stamp}_{number}.jpg')  # Unique image path
+    # Save RGB images (temporary and unique images with timestamp and number in filename)
+    cv2.imwrite(temp_image_path, cv_image)
+    cv2.imwrite(unique_image_path, cv_image)
+
+    image_subscriber.unregister() #Unsubscribe from the image topic, this is neccessary because once it has subscirbed to the topic, there is always new pictures incoming, and thus this will save images until the node is stopped, and the purpose is to only save 1 image, the newest one.
     #cv2.imshow("wow", cv_image)
     #cv2.waitKey(0)
     #rospy.loginfo("hej")
@@ -86,7 +102,7 @@ def callback1(data): #Function that handle the Image message from the depth imag
     #initialize global variables in function scope.
     global stamp
     global number_depth
-    global depth_sub
+    global depth_subscriber
 
     bridge = CvBridge()
 
@@ -100,9 +116,12 @@ def callback1(data): #Function that handle the Image message from the depth imag
 
     
     number_depth +=1
-    filename = '/home/robotlab/ws_rockpicker/src/rockpicker/realsense_ting_controller/scripts/final_test/Image_depth_'+str(stamp)+'_'+str(number_depth)+ '.png'
-    cv2.imwrite(filename, cv_image)
-    depth_sub.unregister()
+    # Constructing file names for the depth image
+    unique_depth_image_path = os.path.join(final_test_dir, f'Image_depth_{stamp}_{number_depth}.png')  # Unique depth image path
+    # Save depth image
+    cv2.imwrite(unique_depth_image_path, cv_image)
+    
+    depth_subscriber.unregister()
     #print(cv_image.shape)
     #print(cv_image.dtype)
     #cv2.imshow("wow", cv_image)
