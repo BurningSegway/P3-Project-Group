@@ -56,8 +56,8 @@ def image_converter(data): #function for handling requests
         global image_subscriber
         global depth_subscriber
 
-        image_subscriber = rospy.Subscriber("/camera/color/image_raw",Image,callback, queue_size=1) #Subscribe to the color image topic, and send the image to callback function
-        depth_subscriber = rospy.Subscriber("/camera/depth/image_rect_raw",Image,callback1, queue_size=1000) #Subscribe to the depth image topic, and send the image to the callback1 function
+        image_subscriber = rospy.Subscriber("/camera/color/image_raw",Image,color_image_callback, queue_size=1) #Subscribe to the color image topic, and send the image to callback function
+        depth_subscriber = rospy.Subscriber("/camera/depth/image_rect_raw",Image,depth_image_callback, queue_size=1000) #Subscribe to the depth image topic, and send the image to the callback1 function
         
         #Let user know the images have been captured.
         print("Image captured")
@@ -67,7 +67,7 @@ def image_converter(data): #function for handling requests
         print("Invalid command")
         return ImageCaptureResponse("Invalid command")
 
-def callback(data): #Function that handles the Image messages from the color image topic.
+def color_image_callback(data): #Function that handles the Image messages from the color image topic.
 
     #initalize variables in function scope
     global stamp
@@ -97,7 +97,7 @@ def callback(data): #Function that handles the Image messages from the color ima
     #cv2.waitKey(0)
     #rospy.loginfo("hej")
 
-def callback1(data): #Function that handle the Image message from the depth image topic
+def depth_image_callback(data): #Function that handle the Image message from the depth image topic
 
     #initialize global variables in function scope.
     global stamp
