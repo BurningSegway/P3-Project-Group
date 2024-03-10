@@ -1,147 +1,165 @@
 #!/usr/bin/env python3
 
-#The camera_server is a service server, when called it will take the latest image puplished to te image topic by the camera, and save it on the computer
+"""
+This ROS node serves as a camera server e.g. for RealSense cameras, offering a 
+service to capture and save both color and depth images when requested.
 
-#import modules and message dependencies
-from __future__ import print_function
+When receiving a 'Capture' request through a ROS service call, it subscribes 
+to the RealSense camera topics for color (/camera/color/image_raw) and 
+depth images (/camera/depth/image_rect_raw). It captures the next incoming 
+image from each stream, saves them to the disk with unique filenames that 
+include a timestamp, and then unsubscribes from the image topics. This 
+ensures that each captured image set (color and depth) is synchronized and 
+saved without overwriting previous captures.
 
+The images are stored in a directory within the 'scripts' folder of the 
+'realsense_ting_controller' ROS package.
+
+Usage:
+Start the camera server node:
+    $ rosrun realsense_ting_controller camera_server.py
+
+The service can be called from the command line using the 'rosservice' command:
+    $ rosservice call /capture_command "request: 'Capture'"
+"""
+
+
+# Standard Python libraries
 import os
-import rospkg
-
-import roslib
-roslib.load_manifest('realsense_ting_controller')
 import sys
+import datetime
+
+# ROS libraries
 import rospy
-import cv2
-from std_msgs.msg import String
-from sensor_msgs.msg import Image
+import rospkg
 from cv_bridge import CvBridge, CvBridgeError
+from sensor_msgs.msg import Image
+from std_msgs.msg import String
+
+# Custom service message
 from realsense_ting_controller.srv import ImageCapture, ImageCaptureResponse
+
+# OpenCV for image processing
+import cv2
+
+# NumPy for array manipulation
 import numpy as np
 
 
-import datetime
+class CameraServer:
+    def __init__(self):
+        """
+        Initialize the CameraServer class and set up the ROS node, service, and
+        image and depth subscribers. Also initialize the paths for image storage.
+        """
+        # Initialize ROS node
+        rospy.init_node('image_converter', anonymous=True)
 
-#using datetime to create a stamp for the pictures, so that next time the server is started, it wont overwrite the images taken previously
-date_time = datetime.datetime.now()
-stamp = str(date_time.year)+'_'+str(date_time.month)+'_'+str(date_time.day)+'_'+str(date_time.hour)+'_'+str(date_time.minute)
+        # Initialize class attributes
+        self.bridge = CvBridge()
+        self.image_subscriber = None
+        self.depth_subscriber = None
+        self.number = 0
+        self.number_depth = 0
+        self.initialize_paths()
 
-#Declaring global values, that is used in several functions, this could be avoided by making the functions methods of a class
-last_number = ''
-number = 0
-number_depth = 0
+        # Initialize ROS service
+        self.service = rospy.Service('capture_command', ImageCapture, self.image_converter)
+        rospy.loginfo("========================================")
+        rospy.loginfo("=== Camera server initialized and    ===")
+        rospy.loginfo("=== ready to receive capture command ===")
+        rospy.loginfo("========================================")
 
-image_subscriber = ''
-depth_subscriber = ''
+    def initialize_paths(self):
+        """
+        Initializes the paths for image directory and final test directory.
+        """
+        # Setup dynamic path management
+        ros_package_path = rospkg.RosPack().get_path('realsense_ting_controller')
+        self.image_dir = os.path.join(ros_package_path, 'scripts')
+        self.final_test_dir = os.path.join(self.image_dir, 'final_test')
+        if not os.path.exists(self.final_test_dir):
+            os.makedirs(self.final_test_dir, exist_ok=True)
+
+    def image_converter(self, req):
+        """
+        When receiving a service request with a 'Capture' command, this function 
+        subscribes to the color and depth image topics of the RealSense camera,
+        capturing and saving the next image from each stream. Each image is saved 
+        with a unique timestamp in its filename to ensure no overwriting happens.
+        """
+        rospy.loginfo("Attempting to capture images now.")
+        if req.request == "Capture":
+            # Capture the timestamp when the capture command is received
+            self.capture_timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+            self.setup_subscribers()
+            rospy.loginfo("Capture command received. Subscribers set up for image and depth capture.")
+            return ImageCaptureResponse('Image captured')
+        else:
+            rospy.logwarn("You sent an invalid request: %s", req.request)
+            return ImageCaptureResponse("Invalid request")
+
+    def setup_subscribers(self):
+        """
+        Set up image and depth subscribers if they are not already initialized.
+        """
+        if not self.image_subscriber:
+            rospy.logdebug("Setting up image subscriber.")
+            self.image_subscriber = rospy.Subscriber("/camera/color/image_raw", Image, self.image_callback, queue_size=1)
+        if not self.depth_subscriber:
+            rospy.logdebug("Setting up depth subscriber.")
+            self.depth_subscriber = rospy.Subscriber("/camera/depth/image_rect_raw", Image, self.depth_callback, queue_size=1)
+
+    def image_callback(self, data):
+        """
+        Callback function for processing color images.
+        """
+        try:
+            cv_image = self.bridge.imgmsg_to_cv2(data, "bgr8")
+            # Process and save the color image as needed
+            rospy.logdebug("Color image received and processed.")
+
+            # Use the stored timestamp for filename
+            filename = os.path.join(self.final_test_dir, f"{self.capture_timestamp}_rgb.png")
+            # Save the image
+            cv2.imwrite(filename, cv_image)
+            rospy.loginfo(f"Color image saved to {filename}.")
+
+            # Unregister the subscriber to stop receiving new images
+            self.image_subscriber.unregister()
+            rospy.logdebug("Image subscriber unregistered.")
+            # Reset the subscriber to None
+            self.image_subscriber = None
+        except CvBridgeError as e:
+            rospy.logerr(e)
+
+    def depth_callback(self, data):
+        """
+        Callback function for processing depth image data.
+        """
+        try:
+            cv_image = self.bridge.imgmsg_to_cv2(data, "passthrough")
+            # Process and save the depth image as needed
+            rospy.logdebug("Depth image received and processed.")
+
+            # Use the stored timestamp for filename
+            filename = os.path.join(self.final_test_dir, f"{self.capture_timestamp}_depth.png")
+            # Save the image
+            cv2.imwrite(filename, cv_image)
+            rospy.loginfo(f"Depth image saved to {filename}.")
+
+            # Unregister the subscriber to stop receiving new depth images
+            self.depth_subscriber.unregister()
+            rospy.logdebug("Depth subscriber unregistered.")
+            # Reset the subscriber to None
+            self.depth_subscriber = None
+        except CvBridgeError as e:
+            rospy.logerr(e)
 
 
-# Find package path
-ros_package_path = rospkg.RosPack().get_path('realsense_ting_controller')
-
-# Constructing file path dynamically
-image_dir = os.path.join(ros_package_path, 'scripts')
-final_test_dir = os.path.join(image_dir, 'final_test')
-os.makedirs(final_test_dir, exist_ok=True)  # Create directory if it doesn't exist, no error if it already exists
-
-
-
-
-def image_converter(data): #function for handling requests 
-
-    cmd = data.request #seperate message to only contain the request
-
-    if cmd == "Capture": #if the request is "Capture" capture an image
-
-        #initiliaze to global variables in the function scope, so they can be saved and used in other functions
-        global image_subscriber
-        global depth_subscriber
-
-        image_subscriber = rospy.Subscriber("/camera/color/image_raw",Image,color_image_callback, queue_size=1) #Subscribe to the color image topic, and send the image to callback function
-        depth_subscriber = rospy.Subscriber("/camera/depth/image_rect_raw",Image,depth_image_callback, queue_size=1000) #Subscribe to the depth image topic, and send the image to the callback1 function
-        
-        #Let user know the images have been captured.
-        print("Image captured")
-        return ImageCaptureResponse('Image captured')
-    else:
-        #if the request is not "Capture" the command is invalid
-        print("Invalid command")
-        return ImageCaptureResponse("Invalid command")
-
-def color_image_callback(data): #Function that handles the Image messages from the color image topic.
-
-    #initalize variables in function scope
-    global stamp
-    global number
-    global image_subscriber
-
-    bridge = CvBridge() #The CvBridge can convert and image from the Image msg to openCV format
-
+if __name__ == '__main__':
     try:
-        cv_image = bridge.imgmsg_to_cv2(data, desired_encoding='bgr8') #desired_encoding='bgr8' 8 bit color image #try to convert the Image msg to an image
-    except CvBridgeError as e:
-        print(e)
-    #rospy.loginfo(message)
-
-    
-    number +=1 #iterate the number variable, used to name images uniquely
-
-    # Constructing file names
-    temp_image_path = os.path.join(image_dir, 'Image.jpg')  # Temporary image path
-    unique_image_path = os.path.join(final_test_dir, f'Image_{stamp}_{number}.jpg')  # Unique image path
-    # Save RGB images (temporary and unique images with timestamp and number in filename)
-    cv2.imwrite(temp_image_path, cv_image)
-    cv2.imwrite(unique_image_path, cv_image)
-
-    image_subscriber.unregister() #Unsubscribe from the image topic, this is neccessary because once it has subscirbed to the topic, there is always new pictures incoming, and thus this will save images until the node is stopped, and the purpose is to only save 1 image, the newest one.
-    #cv2.imshow("wow", cv_image)
-    #cv2.waitKey(0)
-    #rospy.loginfo("hej")
-
-def depth_image_callback(data): #Function that handle the Image message from the depth image topic
-
-    #initialize global variables in function scope.
-    global stamp
-    global number_depth
-    global depth_subscriber
-
-    bridge = CvBridge()
-
-    #print(data.data)
-
-    try:
-        cv_image = bridge.imgmsg_to_cv2(data, desired_encoding='passthrough') #This time it is saved as a 16 bit grayscale image
-    except CvBridgeError as e:
-        print(e)
-        #rospy.loginfo(message)
-
-    
-    number_depth +=1
-    # Constructing file names for the depth image
-    unique_depth_image_path = os.path.join(final_test_dir, f'Image_depth_{stamp}_{number_depth}.png')  # Unique depth image path
-    # Save depth image
-    cv2.imwrite(unique_depth_image_path, cv_image)
-    
-    depth_subscriber.unregister()
-    #print(cv_image.shape)
-    #print(cv_image.dtype)
-    #cv2.imshow("wow", cv_image)
-    #cv2.waitKey(0)
-    #rospy.loginfo("hej")
-
-
-
-
-def main(args):
-
-    rospy.init_node('image_converter', anonymous=True) #initialize the note
-    s = rospy.Service('capture_command', ImageCapture, image_converter) #Start the service which listens to ImageCapture, and image_converte is the function to handle the service request
-    print("Ready to recieve capture command") #Once the node it initialized let the user knoe
-
-    try:                            #try block, to catch a keyboard interrupt, so that potential windoes openen in opencv are closed
-        rospy.spin()                #Tells pytho not to stop the script
-    except KeyboardInterrupt:
-        print("Shutting down")
-    cv2.destroyAllWindows()
- 
-if __name__ == '__main__': #this checks is the file is run as a script, as it should. And would return false if it was imported as a module
-    main(sys.argv) #run the main function
+        camera_server = CameraServer()
+        rospy.spin()
+    except rospy.ROSInterruptException:
+        rospy.loginfo("Camera server node terminated.")
