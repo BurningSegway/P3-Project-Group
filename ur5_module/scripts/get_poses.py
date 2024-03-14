@@ -202,7 +202,10 @@ def move_robot():
 
         print(f"Starting run: {run_count}")
 
-        # Set a targe for the end effector to reach, this is the home position, from where a picture will be taken
+        ###################################
+        ### Move robot to home position ###
+        ###################################
+        # Set a target for the end effector to reach, this is the home position, from where a picture will be taken
         ur5.set_pose_target([0, 0.5, 0.7, -pi, 0, -(pi / 4)])
 
         # Plan the joint move to the target
@@ -215,10 +218,18 @@ def move_robot():
 
         # input("Tryk enter: ")
 
-        # Set a new target, this target is placed where the CV pipeline hat detected a rock, and a preset z height is also parsed to the function
-        ur5.set_pose_target(
-            response_to_coords(image_processing_command_client("Process"), 0.30)
-        )
+        ####################################
+        ### Capture image and process it ###
+        ####################################
+        # Call the image_processing_command_client function, with a request to process an image, this will make the camera take a picture, and process it to find rocks.
+        # Returns a list with the coordinates of the rock, and the length of the shortest and longest axis of the ellipse, and the angle of the shortest axis.
+        image_result = image_processing_command_client("Process")
+
+        #######################################
+        ### Move to rock pre-grasp position ###
+        #######################################
+        # Set a new target, this target is placed where the CV pipeline has detected a rock, and a preset z height is also parsed to the function
+        ur5.set_pose_target(response_to_coords(image_result, z_height=0.30))
 
         # Plan the movement to the rock
         plan = ur5.plan()
@@ -230,6 +241,9 @@ def move_robot():
 
         # input("Tryk enter: ")
 
+        ########################################
+        ### Move to rock grasp and lift pose ###
+        ########################################
         # Declare waypoints list for cartesian move
         waypoints = []
 
@@ -255,11 +269,17 @@ def move_robot():
         # Once planned execute the downward movement
         ur5.execute(plan)
 
+        #########################################
+        ### Close the tool and grasp the rock ###
+        #########################################
         # Call the gripper_commands service, with a request to grip, this will make the gripper close around the rock
         print(gripper_command_client("grip"))
 
         # input("Tryk enter: ")
 
+        #####################
+        ### Lift the rock ###
+        #####################
         # Once gripped, another cartesian path upwards is planned, just like the first
         waypoints = []
 
@@ -286,7 +306,10 @@ def move_robot():
 
         # input("Tryk enter: ")
 
-        # Set target outside of the sandbox
+        ##################################
+        ### Move to rock drop position ###
+        ##################################
+        # Set target outside of the sandbox to drop the rock at a specific location.
         ur5.set_pose_target([-0.7281, 0.009, 0.45, -pi, 0, -(pi / 4)])
 
         # Plan the joint move
@@ -297,6 +320,9 @@ def move_robot():
         # Execute movement
         ur5.execute(plan[1])
 
+        ########################
+        ### Release the rock ###
+        ########################
         # Once end effector is outside the sandbox, another request is sent to the gripper_commands service, to home the gripper, this will open the gripper and drop the rock
         print(gripper_command_client("home"))
 
