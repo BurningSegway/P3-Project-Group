@@ -11,7 +11,8 @@ from math import pi
 from wsg_gripper.srv import *
 from realsense_ting_controller.srv import *
 
-run_count = 1 #Variable to keep track, of how many times the code has itereated, equals to how many times the manipultor has grabbed a rock
+#Variable to keep track, of how many times the code has itereated, equals to how many times the manipultor has grabbed a rock
+run_count = 1 
 
 def gripper_command_client(c):
 
@@ -22,13 +23,16 @@ def gripper_command_client(c):
 
     Once the the function has sent its request to the service, it waits for a response and then returns this.
     '''
-
-    rospy.wait_for_service('gripper_commands') #Wait for the gripper_commands service to become available
+    #Wait for the gripper_commands service to become available
+    rospy.wait_for_service('gripper_commands') 
 
     try:
-        gripper_commands = rospy.ServiceProxy('gripper_commands', GripperCommand) #Declares what type of service message and to what service the request is sent to
-        resp = gripper_commands(c)  #The input to the function is sent as a command, and the response from the service is saved
-        return resp.response #The response part of the service message is returned
+        #Declares what type of service message and to what service the request is sent to
+        gripper_commands = rospy.ServiceProxy('gripper_commands', GripperCommand) 
+        #The input to the function is sent as a command, and the response from the service is saved
+        resp = gripper_commands(c)  
+        #The response part of the service message is returned
+        return resp.response 
 
     except rospy.ServiceException:
         print("Service call failed :(")
@@ -41,13 +45,16 @@ def image_processing_command_client(c):
 
     Once the the function has sent its request to the service, it waits for a response and then returns this.
     '''
- 
-    rospy.wait_for_service('process_image') #Wait for the process_image service to become available
+    #Wait for the process_image service to become available
+    rospy.wait_for_service('process_image') 
 
     try:
-        process_commands = rospy.ServiceProxy('process_image', ImgProc) #Declares what type of service message and to what service the request is sent to
-        resp = process_commands(c) #The input to the function is sent as a command, and the response from the service is saved
-        return resp.response #The response part of the service message is returned
+        #Declares what type of service message and to what service the request is sent to
+        process_commands = rospy.ServiceProxy('process_image', ImgProc) 
+        #The input to the function is sent as a command, and the response from the service is saved
+        resp = process_commands(c) 
+        #The response part of the service message is returned
+        return resp.response 
 
     except rospy.ServiceException:
         print("Service call failed :(")
@@ -73,17 +80,22 @@ def response_to_coords(a, z):
     #The length of the axes are are saved, and the length is calculated in meters, based on the amount of pixel pr distance ratio found earlier
     long_axis_px_leng = a[3]
     short_axis_px_leng = a[2]
-    actual_long_leng = long_axis_px_leng*px #this should be calculated using the angle and the corresponding x and y pixel  ratios, but it was deemed adequite to use the x value, since they are close to each other in the x and y direction
+
+    #this should be calculated using the angle and the corresponding x and y pixel  ratios, but it was deemed adequite to use the x value, since they are close to each other in the x and y direction
+    actual_long_leng = long_axis_px_leng*px 
     actual_short_leng = short_axis_px_leng*px
 
     #Intermediate variables for calculating the volume of an ellipsoid
     A = actual_short_leng/2
     B = actual_long_leng/2
-    C = 0.03 #Constant ellipsoid heigth is set
+    #Constant ellipsoid heigth is set
+    C = 0.03 
 
-    V = (4/3)*pi*A*B*C #Calculating the volume
+    #Calculating the volume
+    V = (4/3)*pi*A*B*C 
 
-    rho = 2700 #Density of granite
+    #Density of granite
+    rho = 2700 
 
     weight = V*rho #Weight estimation
 
@@ -93,7 +105,8 @@ def response_to_coords(a, z):
     print(f"Volume of rock: {V}")
     print(f"Weight of rock: {weight}")
 
-    theta = a[4] #Saving the angle of the shortest axis.
+    #Saving the angle of the shortest axis.
+    theta = a[4] 
 
     #Converting pixel coordinates in the image, to the corresponding distances on the actual image in the real world
     scene_x = img_x*px
@@ -127,14 +140,17 @@ def move_robot():
     '''
     The main script that controls the robots movement, and calling the appropriete services
     '''
-    moveit_commander.roscpp_initialize(sys.argv) #Initialize the MoveIt commander API
-    rospy.init_node("move_group_python_interface_tutorial", anonymous=True) #Initialize the note
+    #Initialize the MoveIt commander API
+    moveit_commander.roscpp_initialize(sys.argv) 
+    #Initialize the node
+    rospy.init_node("move_group_python_interface_tutorial", anonymous=True) 
 
     #Declaring the global variable in the function scope
     global run_count
 
+    #Intanceiating a robot object, to be controlled with MoveIt commander
     group_name = "manipulator"
-    ur5 = moveit_commander.MoveGroupCommander(group_name) #Intanceiating a robot object, to be controlled with MoveIt commander
+    ur5 = moveit_commander.MoveGroupCommander(group_name) 
 
     #Print current pose when the program starts, this is primarely used for debugging
     print(ur5.get_current_pose())
@@ -143,31 +159,39 @@ def move_robot():
     #Once everything has been initialized, the robot is ready to go, and the user must press enter before any movement begins
     input("Tryk enter: ")
 
-    while True: #The program loops
+    #The program loops
+    while True: 
 
         print(f"Starting run: {run_count}")
 
-        ur5.set_pose_target([0, 0.5, 0.7, -pi, 0, -(pi/4)]) #Set a targe for the end effector to reach, this is the home position, from where a picture will be taken
+        #Set a targe for the end effector to reach, this is the home position, from where a picture will be taken
+        ur5.set_pose_target([0, 0.5, 0.7, -pi, 0, -(pi/4)]) 
 
-        plan = ur5.plan() #Plan the joint move to the target
+        #Plan the joint move to the target
+        plan = ur5.plan() 
 
         #input("Tryk enter: ") #Before implementing joint limits, the user must press enter before executing the planned movement, after obersving in RViz that the planned movement is valid, and wont make the robot collide with anything, these checks have been commented out after implemnting proper joint limits
 
-        ur5.execute(plan[1]) #Execute the planned move, this will make the manipulator move in real life
+        #Execute the planned move, this will make the manipulator move in real life
+        ur5.execute(plan[1]) 
 
         #input("Tryk enter: ")
 
-        ur5.set_pose_target(response_to_coords(image_processing_command_client("Process"), 0.30)) #Set a new target, this target is placed where the CV pipeline hat detected a rock, and a preset z height is also parsed to the function
+        #Set a new target, this target is placed where the CV pipeline hat detected a rock, and a preset z height is also parsed to the function
+        ur5.set_pose_target(response_to_coords(image_processing_command_client("Process"), 0.30)) 
 
-        plan = ur5.plan() #Plan the movement to the rock
-
-        #input("Tryk enter: ")
-
-        ur5.execute(plan[1]) #Execute the plan
+        #Plan the movement to the rock
+        plan = ur5.plan() 
 
         #input("Tryk enter: ")
 
-        waypoints = [] #Declare waypoints list for cartesian move
+        #Execute the plan
+        ur5.execute(plan[1]) 
+
+        #input("Tryk enter: ")
+
+        #Declare waypoints list for cartesian move
+        waypoints = [] 
 
         #Get current position, and modify the z position, this will lower the end effector further down, to where it is able to grip a rock
         wpose = ur5.get_current_pose().pose
@@ -178,14 +202,19 @@ def move_robot():
         # which is why we will specify 0.01 as the eef_step in Cartesian
         # translation.
         (plan, fraction) = ur5.compute_cartesian_path(
-            waypoints, 0.01, 0.0  # waypoints to follow  # eef_step
-        )  # jump_threshold
+            # waypoints to follow  
+            waypoints, 0.01, 0.0  
+            # eef_step
+            # jump_threshold
+        )  
 
         #input("Tryk enter: ")
 
-        ur5.execute(plan) #Once planned execute the downward movement
+        #Once planned execute the downward movement
+        ur5.execute(plan) 
 
-        print(gripper_command_client("grip")) #Call the gripper_commands service, with a request to grip, this will make the gripper close around the rock
+        #Call the gripper_commands service, with a request to grip, this will make the gripper close around the rock
+        print(gripper_command_client("grip")) 
 
         #input("Tryk enter: ")
 
@@ -201,29 +230,38 @@ def move_robot():
         # which is why we will specify 0.01 as the eef_step in Cartesian
         # translation.
         (plan, fraction) = ur5.compute_cartesian_path(
-            waypoints, 0.01, 0.0  # waypoints to follow  # eef_step
-        )  # jump_threshold
+            # waypoints to follow  
+            waypoints, 0.01, 0.0  
+            # eef_step
+            # jump_threshold
+        )  
 
         #input("Tryk enter: ")
 
-        ur5.execute(plan) #Execute upwards movement
+        #Execute upwards movement
+        ur5.execute(plan) 
 
         #input("Tryk enter: ")
 
-        ur5.set_pose_target([-0.7281, 0.009, 0.45, -pi, 0, -(pi/4)]) #Set target outside of the sandbox
+        #Set target outside of the sandbox
+        ur5.set_pose_target([-0.7281, 0.009, 0.45, -pi, 0, -(pi/4)]) 
 
-        plan = ur5.plan() #Plan the joint move
+        #Plan the joint move
+        plan = ur5.plan() 
 
         #input("Tryk enter: ")
 
-        ur5.execute(plan[1]) #Execute movement
+        #Execute movement
+        ur5.execute(plan[1]) 
 
-        print(gripper_command_client("home")) #Once end effector is outside the sandbox, another request is sent to the gripper_commands service, to home the gripper, this will open the gripper and drop the rock
+        #Once end effector is outside the sandbox, another request is sent to the gripper_commands service, to home the gripper, this will open the gripper and drop the rock
+        print(gripper_command_client("home")) 
 
-        run_count += 1 #Iterate the run counter
+        #Iterate the run counter
+        run_count += 1 
 
-if __name__ == '__main__': #this checks is the file is run as a script, as it should. And would return false if it was imported as a module
+if __name__ == '__main__': 
     try:             
-        move_robot() #Run the main function.
+        move_robot()
     except rospy.ROSInterruptException:
         pass
