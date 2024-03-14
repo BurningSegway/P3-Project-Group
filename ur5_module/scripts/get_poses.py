@@ -1,6 +1,18 @@
 #!/usr/bin/env python3
 
-# The get_poses script, is the main script of the implementation. This script is started when the robot should do its thing, this script is responsible for making the robot move, calling the appropriete services, to operate the gripper, and process images.
+"""
+The get_poses script orchestrates the movement of a robot using the MoveIt Commander 
+for manipulations and service calls to operate a gripper and process images with a 
+RealSense camera. It handles the sequence of capturing an image, processing it to 
+find objects (e.g., rocks), moving the robot arm to pick up the objects, and placing 
+them at a target location. This script integrates with custom ROS services for gripper 
+control and image processing.
+
+Usage:
+To run this script, use the command: 
+    $ rosrun ur5_module get_poses.py
+"""
+
 
 import sys
 import copy
@@ -15,13 +27,12 @@ from realsense_ting_controller.srv import *
 run_count = 1
 
 
-def gripper_command_client(c):
+def gripper_command_client(command: str):
     """
-    This function will do the service call to the gripper_commands serivce.
+    Sends commands to the gripper via the 'gripper_commands' service, controlling
+    its actions.
 
-    The input c into the function, is the command the gripper should perform.
-
-    Once the the function has sent its request to the service, it waits for a response and then returns this.
+    The command takes the following values 'grip', 'release', or 'home'.
     """
     # Wait for the gripper_commands service to become available
     rospy.wait_for_service("gripper_commands")
@@ -30,7 +41,7 @@ def gripper_command_client(c):
         # Declares what type of service message and to what service the request is sent to
         gripper_commands = rospy.ServiceProxy("gripper_commands", GripperCommand)
         # The input to the function is sent as a command, and the response from the service is saved
-        resp = gripper_commands(c)
+        resp = gripper_commands(command)
         # The response part of the service message is returned
         return resp.response
 
@@ -38,13 +49,12 @@ def gripper_command_client(c):
         print("Service call failed :(")
 
 
-def image_processing_command_client(c):
+def image_processing_command_client(command: str = "Process"):
     """
-    This function will do the service call to the process_image serivce.
+    Requests image processing via the 'process_image' service, instructing it to perform
+    a specified action on the captured image.
 
-    The input c into the function, is the command for the service to process an image.
-
-    Once the the function has sent its request to the service, it waits for a response and then returns this.
+    The input command "Process" will tell the service to process an image.
     """
     # Wait for the process_image service to become available
     rospy.wait_for_service("process_image")
@@ -53,7 +63,7 @@ def image_processing_command_client(c):
         # Declares what type of service message and to what service the request is sent to
         process_commands = rospy.ServiceProxy("process_image", ImgProc)
         # The input to the function is sent as a command, and the response from the service is saved
-        resp = process_commands(c)
+        resp = process_commands(command)
         # The response part of the service message is returned
         return resp.response
 
@@ -61,13 +71,15 @@ def image_processing_command_client(c):
         print("Service call failed :(")
 
 
-def response_to_coords(a, z):
+def response_to_coords(a: list, z_height: float):
     """
     This function takes a and z as input, a is a list one the form ((x, y), (short, long), theta)
-    x and y is the center of an ellipse in pixel coordinates, then it contains the length of the shortest and longest axis of the ellipse in pixel
-    and theta is the angle of the shortest axis, compared to the world x axis
+    x and y is the center of an ellipse in pixel coordinates, then it contains the length
+    of the shortest and longest axis of the ellipse in pixel and theta is the angle of
+    the shortest axis, compared to the world x axis
 
-    This functions takes the pixel coordinates, and translates them into world coordinates, that the gripper can navigate to
+    This functions takes the pixel coordinates, and translates them into world coordinates,
+    that the gripper can navigate to.
 
     The z input is the z height of the end effector so effectively, how far down the end effector will go.
     """
@@ -146,10 +158,11 @@ def response_to_coords(a, z):
     # print(-(theta*pi/180)-(pi/4))
 
     # Returns the position and angle of the ellipse, as a pose command, that the MoveIt commander API can understand
+    # [x, y, z, rot_x, rot_y, rot_z]
     return [
         -(world_mtx[0, 3]),
         world_mtx[1, 3],
-        z,
+        z_height,
         -pi,
         0,
         -(theta * pi / 180) - (pi / 4),
@@ -158,7 +171,12 @@ def response_to_coords(a, z):
 
 def move_robot():
     """
-    The main script that controls the robots movement, and calling the appropriete services
+    Main function to control robot movement. It sequences the entire process of moving
+    to a capture location, processing an image to identify objects, picking up an object
+    based on processed image data, and placing it at a target location.
+
+    It utilizes MoveIt for planning and executing movements and custom ROS services for
+    gripper operations and image processing.
     """
     # Initialize the MoveIt commander API
     moveit_commander.roscpp_initialize(sys.argv)
